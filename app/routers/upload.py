@@ -4,6 +4,11 @@ from app.services.service_upload import ler_planilha
 
 router = APIRouter()
 
+def analisar_ctr(df: pd.dataFrame) -> list:
+    ctr = df["CTR"].str.replace("%", "").astype(float)
+    ruins = df[ctr > 2.0]
+    return ruins[["Nome do Anúncio", "CTR"]].to_dict(orient="records")
+
 @router.post("/upload-planilha")
 async def upload_planilha(arquivo: UploadFile = File (...)):
 
@@ -19,9 +24,14 @@ async def upload_planilha(arquivo: UploadFile = File (...)):
         raise HTTPException(status_code=422, detail=f"Erro ao ler arquivo")
 
 
-    return JSONResponse(content={
-        "arquivo": arquivo.filename,
-        "linhas": len(df),
-        "colunas": list(df.columns),
-        "preview": df.head(5).to_dict(orient="records")
-    })
+    #return JSONResponse(content={
+        #"arquivo": arquivo.filename,
+        #"linhas": len(df),
+        #"colunas": list(df.columns),
+        #"preview": df.head(5).to_dict(orient="records")
+    #}) 
+
+    resultado = analisar_ctr(df)
+    return resultado
+
+
