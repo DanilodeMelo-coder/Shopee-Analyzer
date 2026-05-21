@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from app.services.service_upload import ler_planilha
 from app.services.service_analyzer import analisar_ctr
+import app.estado_atual as estado
 
 router = APIRouter()
 
@@ -17,17 +18,17 @@ async def upload_planilha(arquivo: UploadFile = File (...)):
     conteudo = await arquivo.read()
 
     try:
-        df = ler_planilha(conteudo, arquivo.filename)
+        estado.df_atual = ler_planilha(conteudo, arquivo.filename)
     except:
         raise HTTPException(status_code=422, detail=f"Erro ao ler arquivo")
 
-    resultado_ctr = analisar_ctr(df)
+    resultado_ctr = analisar_ctr(estado.df_atual)
 
     return JSONResponse(content={
         "arquivo": arquivo.filename,
-        "linhas": len(df),
-        "colunas": list(df.columns),
-        "preview": df.head(5).to_dict(orient="records"), "CTR": resultado_ctr
+        "linhas": len(estado.df_atual),
+        "colunas": list(estado.df_atual.columns),
+        "preview": estado.df_atual.head(5).to_dict(orient="records"), "CTR": resultado_ctr
     }) 
 
 
