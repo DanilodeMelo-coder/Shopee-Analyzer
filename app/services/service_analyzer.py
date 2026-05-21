@@ -9,14 +9,14 @@ def analisar_ctr(df: pd.dataFrame) -> list:
 
 
 def analisar_taxaconversao(df: pd.dataFrame) -> list:
-    tx_conversao = df["Taxa de conversão"].str.replace("%", "").astype(float)
+    tx_conversao = df["Taxa de Conversão"].str.replace("%", "").astype(float)
 
     df = df.copy()
     df["classificacao"] = tx_conversao.apply(classificar_taxa)
 
     ruins = df[df["classificacao"] == "Ruim"]
 
-    return ruins[["Nome do Anúncio", "Taxa de conversão", "classificacao"]].to_dict(orient="records")
+    return ruins[["Nome do Anúncio", "Taxa de Conversão", "classificacao"]].to_dict(orient="records")
 
 
     
